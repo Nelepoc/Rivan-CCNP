@@ -1,0 +1,64 @@
+Scratch Day 2
+
+route add 10.0.0.0 mask 255.0.0.0 10.41.1.4
+
+route add 200.0.0.0 mask 255.255.255.0 10.41.1.4
+
+========================================================
+
+Amsible
+-one of the most common automation tool made by Red Rat, used in configuring cisco devices,
+also in Linux(with ssh Enable)
+- Ansible is Agentless, it means is does not require any software to be installed on the remote device
+It only requires IP Add and pingable.
+
+- Ansible runs on Linux OS only and based on Python.( case and space sensitive source conding, using Tab key
+can be problematic)
+
+-Ansible source file is .yml(using an markup language called YAML)
+Yet, Another, Markup, Language
+
+-To setup, it requires the control Machine (where the devices assumes control to remote devices)
+, and Remote Machine (devices that is being remtely configured automatically)
+
+(Directory from pc to Github)
+cd Desktop
+cd _Jonnel
+git clone https://github.com/rivan16/ansible2
+
+
+======================================
+(Adding Route Linux based on Ansible)
+ip route add 10.0.0.0/8 via 10.41.1.4
+
+
+(in ansibleCRT)
+nano host
+
+[switch]
+Ipp adddresses
+
+[cucm]
+Ip Add
+
+[edge]
+Ip Add
+
+verify:cat host
+Saving cntrlS to save and cntrl x to exit
+
+nano (playbook)
+
+ansible-playbook (playbook)
+
+=======================================================
+
+git clone https://github.com/ggenergg/RivanSecureCRTsolo
+
+git clone https://github.com/ggenergg/RST-DualStackRouting
+
+
+
+
+
+
