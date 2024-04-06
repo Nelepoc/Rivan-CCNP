@@ -1,0 +1,136 @@
+Day 4
+
+
+a:c::/64
+::/0
+fe80::a:0:0:f:/64
+2002:6500:0:3000::/64
+::1/128
+ff00:0:0:beef:a00a:aa0::/8
+
+
+ISE= Identity Service Engine
+Accessing Cisco devices can be authenticated via
+-Local Database
+-Remotely to server ( Radius/ Tacacs+)
+-Implementing AAA(Authentication, Authorization, Accounting
+
+
+RADIUS					TACACS+
+-Remote Access Dial-In User Service	-Terminal Access Controller
+					Access Control System+
+
+-Combined authentication&authorization	-Separate all 3 elements of AAA	
+				-
+-Less Secure, hashes only password	-Cisco Proprietary, Mpre Secure
+no command logging, Vendor Independent	(encrypted username/password)
+					Full command logging
+
+-UDP Oriented				-TCP Oriented
+
+-Can be authenticated via Winservers's	-auth in AD and Cisco ISE
+Active Directory
+
+
+
+
+====================================================================================
+
+
+
+IPSLA
+
+
+config t
+no router bgp 1
+!
+ip sla auto discovery
+!
+no ip sla 1
+ip sla 1
+ icmp-echo 208.8.8.4 source-interface e1/1
+ threshold 3000
+ timeout 3000
+ frequency 3
+ip sla schedule 1 life forever start-time now
+!
+no ip sla 2
+ip sla 2
+ icmp-echo 207.7.7.2 source-interface e1/2
+ threshold 3000
+ timeout 3000
+ frequency 3
+ip sla schedule 2 life forever start-time now
+!
+no ip sla 3
+ip sla 3
+ icmp-echo 209.9.9.3 source-interface e1/3
+ threshold 3000
+ timeout 3000
+ frequency 3
+ip sla schedule 3 life forever start-time now
+!
+!
+track 10 ip sla 1 reachability
+ delay down 1 up 1
+!
+track 20 ip sla 2 reachability
+ delay down 1 up 1
+!
+track 30 ip sla 3 reachability
+ delay down 1 up 1
+!
+!
+ip route 55.55.55.55 255.255.255.255 208.8.8.4 track 10
+ip route 55.55.55.55 255.255.255.255 207.7.7.2 track 20
+ip route 55.55.55.55 255.255.255.255 209.9.9.3 30
+!
+ip route 0.0.0.0 0.0.0.0 208.8.8.4 track 10
+ip route 0.0.0.0 0.0.0.0 207.7.7.2 track 20
+ip route 0.0.0.0 0.0.0.0 209.9.9.3 30
+!
+!
+route-map PBR permit 10
+ match ip address 10
+ set ip next-hop verify-availability 208.8.8.4 1 track 10     !!!final step to forever ping
+!
+route-map PBR permit 20
+ match ip address 11
+ set ip next-hop verify-availability 207.7.7.2 2 track 20
+!
+route-map PBR permit 30
+ match ip address 12
+ set ip next-hop verify-availability 209.9.9.3 3 track 30
+!
+access-list 8 permit any
+access-list 10 permit any
+access-list 11 permit any
+access-list 12 permit any
+!
+int e1/1
+ ip nat outside
+int e1/2
+ ip nat outside
+int e1/3
+ ip nat outside
+int e1/0
+ ip nat inside
+ ip policy route-map PBR
+!
+ip nat inside source route-map ISP2 interface e1/2 overload
+route-map ISP2 permit 10
+ match ip address 8
+ match interface e1/2
+!
+ip nat inside source route-map ISP1 interface e1/1 overload
+route-map ISP1 permit 10
+ match ip address 8
+ match interface e1/1
+!
+ip nat inside source route-map ISP3 interface e1/3 overload
+route-map ISP3 permit 10
+ match ip address 8
+ match interface e1/3
+!
+
+	
